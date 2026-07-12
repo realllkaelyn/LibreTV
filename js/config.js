@@ -121,9 +121,3 @@ const CUSTOM_API_CONFIG = {
 
 // 隐藏内置黄色采集站API的变量
 const HIDE_BUILTIN_ADULT_APIS = false;
-
-API_SITES: [
-  { name: "爱奇艺", url: "https://iqiyizyapi.com/api.php/provide/vod" },
-  { name: "360资源", url: "https://360zyzz.com/api.php/provide/vod" }
-],
-HIDE_BUILTIN_ADULT_APIS: false // 控制内置敏感API显示
