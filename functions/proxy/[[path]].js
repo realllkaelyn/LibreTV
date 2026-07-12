@@ -116,18 +116,6 @@ export async function onRequest(context) {
         return true;
     }
 
-    // 验证鉴权（主函数调用）
-    if (!validateAuth(request, env)) {
-        return new Response('Unauthorized', { 
-            status: 401,
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'GET, HEAD, POST, OPTIONS',
-                'Access-Control-Allow-Headers': '*'
-            }
-        });
-    }
-
     // 输出调试日志 (需要设置 DEBUG: true 环境变量)
     function logDebug(message) {
         if (DEBUG_ENABLED) {
@@ -253,8 +241,8 @@ export async function onRequest(context) {
             'Accept': '*/*',
             // 尝试传递一些原始请求的头信息
             'Accept-Language': request.headers.get('Accept-Language') || 'zh-CN,zh;q=0.9,en;q=0.8',
-            // 尝试设置 Referer 为目标网站的域名，或者传递原始 Referer
-            'Referer': request.headers.get('Referer') || new URL(targetUrl).origin
+            // 使用目标站点作为 Referer，避免图片域名的防盗链拒绝请求。
+            'Referer': `${new URL(targetUrl).origin}/`
         });
 
         try {
@@ -269,9 +257,19 @@ export async function onRequest(context) {
                  throw new Error(`HTTP error ${response.status}: ${response.statusText}. URL: ${targetUrl}. Body: ${errorBody.substring(0, 150)}`);
             }
 
-            // 读取响应内容为文本
-            const content = await response.text();
             const contentType = response.headers.get('Content-Type') || '';
+            const responseBuffer = await response.arrayBuffer();
+            const isTextContent =
+                contentType.startsWith('text/') ||
+                contentType.includes('json') ||
+                contentType.includes('javascript') ||
+                contentType.includes('xml') ||
+                contentType.includes('mpegurl') ||
+                /\.m3u8(?:$|\?)/i.test(targetUrl);
+            // JSON/M3U8 等继续按文本处理；图片、视频等保留原始二进制字节。
+            const content = isTextContent
+                ? new TextDecoder().decode(responseBuffer)
+                : responseBuffer;
             logDebug(`请求成功: ${targetUrl}, Content-Type: ${contentType}, 内容长度: ${content.length}`);
             return { content, contentType, responseHeaders: response.headers }; // 同时返回原始响应头
 
@@ -440,7 +438,7 @@ export async function onRequest(context) {
             kvNamespace = null; // 确保设为 null
         }
 
-        if (kvNamespace) {
+        if (kvNamespace && typeof content === 'string') {
             try {
                 const cachedContent = await kvNamespace.get(cacheKey);
                 if (cachedContent) {
