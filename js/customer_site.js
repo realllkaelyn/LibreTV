@@ -63,6 +63,12 @@ const CUSTOMER_SITES = {
     }
 };
 
+// Cloudflare Pages 中的 API_SITES_JSON 会在运行时覆盖或扩展内置源。
+const CLOUDFLARE_SITES = window.__ENV__?.API_SITES;
+if (CLOUDFLARE_SITES && typeof CLOUDFLARE_SITES === 'object' && !Array.isArray(CLOUDFLARE_SITES)) {
+    Object.assign(CUSTOMER_SITES, CLOUDFLARE_SITES);
+}
+
 // 调用全局方法合并
 if (window.extendAPISites) {
     window.extendAPISites(CUSTOMER_SITES);
