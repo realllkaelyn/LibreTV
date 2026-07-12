@@ -16,9 +16,16 @@ export async function onRequest(context) {
     }
     html = html.replace('window.__ENV__.PASSWORD = "{{PASSWORD}}";', 
       `window.__ENV__.PASSWORD = "${passwordHash}";`);
-    
+
+    // HTML 包含当前环境的密码哈希，不允许 Cloudflare 或浏览器复用旧页面。
+    const headers = new Headers(response.headers);
+    headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+    headers.set('Pragma', 'no-cache');
+    headers.set('Expires', '0');
+    headers.delete('Content-Length');
+
     return new Response(html, {
-      headers: response.headers,
+      headers,
       status: response.status,
       statusText: response.statusText,
     });
@@ -26,3 +33,4 @@ export async function onRequest(context) {
   
   return response;
 }
+
