@@ -412,29 +412,25 @@
     <script>
         // 保存原始 js‑sha256 实现，避免被 password.js 覆盖
         window._jsSha256 = window.sha256;
+
+        // Cloudflare Pages 在返回 HTML 时会将 PASSWORD 替换为安全哈希。
+        // 必须在其他脚本前初始化，避免读取到旧值或空值。
+        window.__ENV__ = window.__ENV__ || {};
+        window.__ENV__.PASSWORD = "{{PASSWORD}}";
+        window.__LIBRETV_BUILD__ = '20260712-2';
     </script>
-    <script src="js/config.js"></script>
-    <script src="js/proxy-auth.js"></script>
-    <script src="js/customer_site.js"></script>
+    <script src="js/config.js?v=20260712-2"></script>
+    <script src="js/proxy-auth.js?v=20260712-2"></script>
+    <script src="js/customer_site.js?v=20260712-2"></script>
     <script src="js/ui.js"></script>
     <script src="js/api.js"></script>
-    <script src="js/douban.js"></script>
-    <script src="js/password.js"></script>
+    <script src="js/douban.js?v=20260712-2"></script>
+    <script src="js/password.js?v=20260712-2"></script>
     <script src="js/search.js"></script>
-    <script src="js/app.js"></script>
+    <script src="js/app.js?v=20260712-2"></script>
 
     <!-- PWA 注册 -->
     <script src="js/pwa-register.js"></script>
-
-    <!-- 环境变量注入脚本 -->
-    <script>
-        // 创建全局环境变量对象
-        window.__ENV__ = window.__ENV__ || {};
-        
-        // 注入服务器端环境变量 (将由服务器端替换)
-        // PASSWORD 变量将在这里被服务器端注入
-        window.__ENV__.PASSWORD = "{{PASSWORD}}";
-    </script>
 
     <!-- 版本检测脚本 -->
     <script src="js/version-check.js"></script>
@@ -443,3 +439,4 @@
     <script src="js/index-page.js"></script>
 </body>
 </html>
+
