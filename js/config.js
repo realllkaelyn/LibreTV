@@ -23,8 +23,8 @@ const SITE_CONFIG = {
 // API站点配置
 const API_SITES = {
     testSource: {
-        api: 'https://iqiyizyapi.com/api.php/provide/vod',
-        name: '爱奇艺',
+        api: 'https://www.example.com/api.php/provide/vod',
+        name: '空内容测试源',
         adult: true
     }
     //ARCHIVE https://telegra.ph/APIs-08-12
@@ -121,3 +121,9 @@ const CUSTOM_API_CONFIG = {
 
 // 隐藏内置黄色采集站API的变量
 const HIDE_BUILTIN_ADULT_APIS = false;
+
+API_SITES: [
+  { name: "爱奇艺", url: "https://iqiyizyapi.com/api.php/provide/vod" },
+  { name: "360资源", url: "https://360zyzz.com/api.php/provide/vod" }
+],
+HIDE_BUILTIN_ADULT_APIS: false // 控制内置敏感API显示
